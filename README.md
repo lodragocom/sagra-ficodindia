@@ -19,6 +19,11 @@ npm run build    # build di produzione
 npm run preview  # anteprima della build
 ```
 
+> **`npm install` va lanciato dal Terminale del Mac**, non dalla shell che Claude usa sul
+> computer: quella è una VM Linux e installerebbe i binari nativi sbagliati (rolldown, oxc),
+> con `npm run dev` che poi fallisce sul caricamento di `vite.config.ts`. Se succede:
+> `rm -rf node_modules package-lock.json && npm install`.
+
 ## Struttura
 
 ```
