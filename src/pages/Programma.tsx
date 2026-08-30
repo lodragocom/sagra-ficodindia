@@ -1,58 +1,94 @@
+import { useMemo, useState } from 'react'
+import { AnimatePresence } from 'motion/react'
 import Sezione from '../components/Sezione'
-import DaFare from '../components/DaFare'
-import { edizione } from '../data/edizione'
-
-const formato = new Intl.DateTimeFormat('it-IT', {
-  weekday: 'long',
-  day: 'numeric',
-  month: 'long',
-})
+import CartaEvento from '../components/CartaEvento'
+import { SpiaLive, Vuoto } from '../components/Stato'
+import { useTabella } from '../hooks/useTabella'
+import { useAdesso } from '../hooks/useAdesso'
+import { giorniDiRiserva } from '../data/edizione'
+import { mostraGiorno, mostraGiornoCorto, ordinaPerOrario } from '../lib/orario'
+import type { Evento } from '../lib/tipi'
 
 export default function Programma() {
+  const adesso = useAdesso()
+  const { righe: eventi, stato, errore, inAscolto } = useTabella<Evento>('sagra_eventi', 'giorno')
+  const [giornoScelto, setGiornoScelto] = useState<string | null>(null)
+
+  const giorni = useMemo(() => {
+    const dagliEventi = [...new Set(eventi.map((e) => e.giorno))].sort()
+    return dagliEventi.length > 0 ? dagliEventi : giorniDiRiserva
+  }, [eventi])
+
+  const visibili = giornoScelto ? giorni.filter((g) => g === giornoScelto) : giorni
+
   return (
     <Sezione
       titolo="Programma"
-      sottotitolo="Sei giornate su due weekend. Gli orari possono cambiare: questa pagina è sempre la versione buona."
+      sottotitolo="Gli orari possono cambiare fino all'ultimo. Questa pagina è sempre la versione buona."
+      azione={<SpiaLive attiva={inAscolto} />}
     >
-      <div className="space-y-10">
-        {edizione.weekend.map((w, i) => (
-          <div key={w.dal}>
-            <h2 className="font-display text-2xl text-cactus-scuro">
-              {i === 0 ? 'Primo weekend' : 'Secondo weekend'}
-            </h2>
-            <div className="mt-4 space-y-4">
-              {giorniDi(w.dal, w.al).map((g) => (
-                <div key={g} className="border-l-2 border-magenta pl-4">
-                  <p className="font-medium capitalize">
-                    {formato.format(new Date(g))}
-                  </p>
-                  <p className="text-sm text-antracite-chiaro mt-1">
-                    Programma da caricare
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
+      <div className="mb-8 flex flex-wrap gap-2">
+        <Chip attivo={giornoScelto === null} onClick={() => setGiornoScelto(null)}>
+          Tutti i giorni
+        </Chip>
+        {giorni.map((g) => (
+          <Chip key={g} attivo={giornoScelto === g} onClick={() => setGiornoScelto(g)}>
+            {mostraGiornoCorto(g)}
+          </Chip>
         ))}
       </div>
 
-      <div className="mt-10">
-        <DaFare>
-          Gli eventi arriveranno dalla tabella <code>sagra_eventi</code> su Supabase.
-          Serve prima il programma definitivo dalla Proloco.
-        </DaFare>
-      </div>
+      {eventi.length === 0 ? (
+        <Vuoto stato={stato} errore={errore} tabella="sagra_eventi" cosa="il programma" />
+      ) : (
+        <div className="space-y-10">
+          <AnimatePresence mode="popLayout">
+            {visibili.map((g) => {
+              const delGiorno = ordinaPerOrario(eventi.filter((e) => e.giorno === g))
+              return (
+                <div key={g}>
+                  <h2 className="font-display text-2xl capitalize text-cactus-scuro">
+                    {mostraGiorno(g)}
+                  </h2>
+                  <div className="mt-4 space-y-4">
+                    {delGiorno.length === 0 ? (
+                      <p className="text-sm text-antracite-chiaro">Programma da caricare.</p>
+                    ) : (
+                      delGiorno.map((e) => (
+                        <CartaEvento key={e.id} evento={e} adesso={adesso} />
+                      ))
+                    )}
+                  </div>
+                </div>
+              )
+            })}
+          </AnimatePresence>
+        </div>
+      )}
     </Sezione>
   )
 }
 
-function giorniDi(dal: string, al: string): string[] {
-  const out: string[] = []
-  const d = new Date(dal)
-  const fine = new Date(al)
-  while (d <= fine) {
-    out.push(d.toISOString().slice(0, 10))
-    d.setDate(d.getDate() + 1)
-  }
-  return out
+function Chip({
+  attivo,
+  onClick,
+  children,
+}: {
+  attivo: boolean
+  onClick: () => void
+  children: React.ReactNode
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={
+        attivo
+          ? 'rounded-full bg-antracite px-4 py-1.5 text-sm capitalize text-avorio'
+          : 'rounded-full border border-antracite/25 px-4 py-1.5 text-sm capitalize text-antracite-chiaro hover:border-antracite/50'
+      }
+    >
+      {children}
+    </button>
+  )
 }

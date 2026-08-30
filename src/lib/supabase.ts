@@ -17,4 +17,6 @@ export const supabase = supabaseConfigurato
 //   sagra_edizioni       anno, numero, date, claim, pubblicata
 //   sagra_eventi         giorno, ora, titolo, luogo, descrizione, categoria, pubblicato
 //   sagra_sponsor        nome, logo_url, livello, sito, ordine
-//   sagra_aggiornamenti  data, titolo, testo, in_evidenza
+//   sagra_aggiornamenti  pubblicato_il, titolo, testo, in_evidenza
+//   sagra_info           titolo, testo, ordine
+// Schema completo con RLS e realtime: supabase/schema.sql
