@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+/* Palette campionata dalla locandina della 33ª edizione (2025).
+   Da riconfermare quando il concept master 2026 è approvato. */
+@theme {
+  --color-avorio: #F7F4EA;
+  --color-avorio-scuro: #DDD3AF;
+  --color-antracite: #44403D;
+  --color-antracite-chiaro: #5D5D5C;
+  --color-cactus: #4B9A64;
+  --color-cactus-scuro: #2A6C5F;
+  --color-magenta: #E165A1;
+  --color-giallo: #F5D63B;
+  --color-ocra: #DCAC0C;
+
+  --font-display: "Georgia", "Times New Roman", serif;
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+}
+
+body {
+  background-color: var(--color-avorio);
+  color: var(--color-antracite);
+}
