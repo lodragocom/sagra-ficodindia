@@ -1,6 +1,10 @@
 -- Sagra della Mostarda e del Ficodindia — schema
--- Gira sul progetto Supabase di CalatinoLab25. Tutte le tabelle sono prefissate `sagra_`
--- per non confondersi con quelle di Energia e degli altri rami.
+-- Gira sul progetto Supabase di CalatinoLab25 (ref ktcsnwyngukqbhbkgjea).
+-- Tutte le tabelle sono prefissate `sagra_` per non confondersi con quelle di Energia
+-- e degli altri rami.
+--
+-- APPLICATO il 30/08/2026 come migrazione `sagra_ficodindia_schema`.
+-- Questo file è la copia di riferimento: se si modifica, si riapplica come nuova migrazione.
 
 create table if not exists sagra_edizioni (
   id          uuid primary key default gen_random_uuid(),
@@ -70,14 +74,33 @@ alter table sagra_info          enable row level security;
 create policy "sagra_edizioni lettura pubblica"   on sagra_edizioni      for select using (attiva);
 create policy "sagra_eventi lettura pubblica"     on sagra_eventi        for select using (pubblicato);
 create policy "sagra_sponsor lettura pubblica"    on sagra_sponsor       for select using (pubblicato);
-create policy "sagra_aggior lettura pubblica"     on sagra_aggiornamenti for select using (pubblicato);
+create policy "sagra_aggiornamenti lettura pubblica" on sagra_aggiornamenti for select using (pubblicato);
 create policy "sagra_info lettura pubblica"       on sagra_info          for select using (pubblicato);
 
-create policy "sagra_edizioni scrittura"   on sagra_edizioni      for all to authenticated using (true) with check (true);
-create policy "sagra_eventi scrittura"     on sagra_eventi        for all to authenticated using (true) with check (true);
-create policy "sagra_sponsor scrittura"    on sagra_sponsor       for all to authenticated using (true) with check (true);
-create policy "sagra_aggior scrittura"     on sagra_aggiornamenti for all to authenticated using (true) with check (true);
-create policy "sagra_info scrittura"       on sagra_info          for all to authenticated using (true) with check (true);
+-- Scrittura: SOLO admin e moderator, tramite la funzione has_role() che esiste già sul
+-- progetto. Non "authenticated": su questo Supabase si registrano anche i lead dell'energia,
+-- e un lead registrato non deve poter toccare il programma della Sagra.
+-- Alla Proloco si assegna il ruolo `moderator` in public.user_roles.
+
+create policy "sagra_edizioni gestione" on sagra_edizioni for all to authenticated
+  using (public.has_role(auth.uid(), 'admin') or public.has_role(auth.uid(), 'moderator'))
+  with check (public.has_role(auth.uid(), 'admin') or public.has_role(auth.uid(), 'moderator'));
+
+create policy "sagra_eventi gestione" on sagra_eventi for all to authenticated
+  using (public.has_role(auth.uid(), 'admin') or public.has_role(auth.uid(), 'moderator'))
+  with check (public.has_role(auth.uid(), 'admin') or public.has_role(auth.uid(), 'moderator'));
+
+create policy "sagra_sponsor gestione" on sagra_sponsor for all to authenticated
+  using (public.has_role(auth.uid(), 'admin') or public.has_role(auth.uid(), 'moderator'))
+  with check (public.has_role(auth.uid(), 'admin') or public.has_role(auth.uid(), 'moderator'));
+
+create policy "sagra_aggiornamenti gestione" on sagra_aggiornamenti for all to authenticated
+  using (public.has_role(auth.uid(), 'admin') or public.has_role(auth.uid(), 'moderator'))
+  with check (public.has_role(auth.uid(), 'admin') or public.has_role(auth.uid(), 'moderator'));
+
+create policy "sagra_info gestione" on sagra_info for all to authenticated
+  using (public.has_role(auth.uid(), 'admin') or public.has_role(auth.uid(), 'moderator'))
+  with check (public.has_role(auth.uid(), 'admin') or public.has_role(auth.uid(), 'moderator'));
 
 -- Realtime: senza questo il sito non riceve i cambi mentre la pagina è aperta.
 alter publication supabase_realtime add table sagra_eventi;
