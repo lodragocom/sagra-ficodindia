@@ -1,6 +1,7 @@
 import { motion } from 'motion/react'
 import { Link } from 'react-router-dom'
 import Pianeta from '../components/Pianeta'
+import Percorso from '../components/Percorso'
 import CartaEvento from '../components/CartaEvento'
 import { SpiaLive } from '../components/Stato'
 import { useEdizione } from '../hooks/useEdizione'
@@ -111,6 +112,8 @@ export default function Home() {
           </Link>
         </section>
       )}
+
+      <Percorso />
     </div>
   )
 }

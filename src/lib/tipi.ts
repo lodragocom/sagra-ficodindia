@@ -49,3 +49,17 @@ export type Info = {
   ordine: number
   pubblicato: boolean
 }
+
+export type StatoPassaggio = 'fatto' | 'in corso' | 'da fare'
+
+export type Passaggio = {
+  id: string
+  ordine: number
+  titolo: string
+  testo: string | null
+  immagine_url: string | null
+  didascalia: string | null
+  stato: StatoPassaggio
+  data: string | null
+  pubblicato: boolean
+}

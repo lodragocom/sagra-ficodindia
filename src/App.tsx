@@ -7,13 +7,10 @@ import Sponsor from './pages/Sponsor'
 import Info from './pages/Info'
 import Aggiornamenti from './pages/Aggiornamenti'
 
-const voci = [
-  { to: '/', label: 'Home', end: true },
-  { to: '/programma', label: 'Programma' },
-  { to: '/sponsor', label: 'Sponsor' },
-  { to: '/info', label: 'Info' },
-  { to: '/aggiornamenti', label: 'Aggiornamenti' },
-]
+// Il menù mostra solo ciò che ha contenuti veri. Programma, sponsor, info e
+// aggiornamenti restano raggiungibili per indirizzo e rientrano qui quando il
+// database ha righe pubblicate — non prima: sezioni vuote indeboliscono il lavoro.
+const voci: { to: string; label: string; end?: boolean }[] = []
 
 export default function App() {
   const { edizione } = useEdizione()
@@ -26,6 +23,12 @@ export default function App() {
           <NavLink to="/" className="font-display text-lg tracking-tight">
             {edizione.numero}ª Sagra
           </NavLink>
+          <a
+            href="#percorso"
+            className="text-sm text-antracite-chiaro transition-colors hover:text-antracite"
+          >
+            Il percorso
+          </a>
           <div className="flex flex-wrap gap-x-5 gap-y-1 text-sm">
             {voci.map((v) => (
               <NavLink
