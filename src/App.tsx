@@ -23,12 +23,20 @@ export default function App() {
           <NavLink to="/" className="font-display text-lg tracking-tight">
             {edizione.numero}ª Sagra
           </NavLink>
-          <a
-            href="#percorso"
-            className="text-sm text-antracite-chiaro transition-colors hover:text-antracite"
-          >
-            Il percorso
-          </a>
+          <div className="flex flex-wrap gap-x-5 gap-y-1 text-sm">
+            <a
+              href="#locandina"
+              className="text-antracite-chiaro transition-colors hover:text-antracite"
+            >
+              La locandina
+            </a>
+            <a
+              href="#progetto"
+              className="text-antracite-chiaro transition-colors hover:text-antracite"
+            >
+              Il progetto
+            </a>
+          </div>
           <div className="flex flex-wrap gap-x-5 gap-y-1 text-sm">
             {voci.map((v) => (
               <NavLink
