@@ -45,8 +45,13 @@ export function useTabella<T>(
     }
     void carica()
 
+    // Il nome del canale deve essere unico per ogni sottoscrizione: due componenti
+    // che leggono la stessa tabella (o il doppio montaggio di React in sviluppo)
+    // riuserebbero lo stesso canale, e `.on()` su un canale già sottoscritto lancia.
+    const nome = `sagra:${tabella}:${Math.random().toString(36).slice(2)}`
+
     const canale = client
-      .channel(`sagra:${tabella}`)
+      .channel(nome)
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: tabella },
