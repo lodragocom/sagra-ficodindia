@@ -75,14 +75,14 @@ export default function Pianeta() {
             playsInline
             preload="metadata"
             aria-label="Il ficodindia con le quattro meraviglie e le rotte che vi convergono"
-            className="h-auto w-full max-w-[22rem] sm:max-w-[26rem]"
+            className="h-auto w-full max-w-[20rem] sm:max-w-[24rem]"
             onError={() => setAnimato(false)}
           />
         ) : (
           <img
             src="/ficodindia.png"
             alt="Il ficodindia con le quattro meraviglie e le rotte che vi convergono"
-            className="h-auto w-full max-w-[22rem] sm:max-w-[26rem]"
+            className="h-auto w-full max-w-[20rem] sm:max-w-[24rem]"
           />
         )}
       </div>
