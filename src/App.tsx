@@ -6,6 +6,7 @@ import Programma from './pages/Programma'
 import Sponsor from './pages/Sponsor'
 import Info from './pages/Info'
 import Aggiornamenti from './pages/Aggiornamenti'
+import Cookie from './components/Cookie'
 
 // Il menù mostra solo ciò che ha contenuti veri. Programma, sponsor, info e
 // aggiornamenti restano raggiungibili per indirizzo e rientrano qui quando il
@@ -84,6 +85,8 @@ export default function App() {
           </span>
         </div>
       </footer>
+
+      <Cookie />
     </div>
   )
 }

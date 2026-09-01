@@ -2,7 +2,10 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import './index.css'
+import { preparaConsenso } from './lib/consenso'
 import App from './App.tsx'
+
+preparaConsenso()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
