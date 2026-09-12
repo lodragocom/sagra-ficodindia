@@ -8,10 +8,17 @@ import Info from './pages/Info'
 import Aggiornamenti from './pages/Aggiornamenti'
 import Cookie from './components/Cookie'
 
-// Il menù mostra solo ciò che ha contenuti veri. Programma, sponsor, info e
-// aggiornamenti restano raggiungibili per indirizzo e rientrano qui quando il
-// database ha righe pubblicate — non prima: sezioni vuote indeboliscono il lavoro.
-const voci: { to: string; label: string; end?: boolean }[] = []
+// Il menù mostra solo ciò che ha contenuti veri. Sponsor, info e aggiornamenti
+// restano raggiungibili per indirizzo e rientrano qui quando il database ha
+// righe pubblicate — non prima: sezioni vuote indeboliscono il lavoro.
+//
+// Il programma è l'eccezione, ed è un'eccezione motivata: è la destinazione del
+// QR stampato sulla locandina. Deve essere raggiungibile dal menù anche prima
+// che gli spettacoli siano definiti, perché la pagina in quel caso non è vuota —
+// mostra i sei giorni e dice che gli orari stanno arrivando.
+const voci: { to: string; label: string; end?: boolean }[] = [
+  { to: '/programma', label: 'Programma' },
+]
 
 export default function App() {
   const { edizione } = useEdizione()

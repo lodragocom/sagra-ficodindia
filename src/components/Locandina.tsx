@@ -1,14 +1,17 @@
 import { motion } from 'motion/react'
+import Manifesto from './Manifesto'
 import { useEdizione } from '../hooks/useEdizione'
-import { mostraGiorno } from '../lib/orario'
+import { useGiorni } from '../hooks/useGiorni'
+import { mostraGiorniEdizione } from '../lib/orario'
 
 /**
  * L'apertura della pagina: prima si vede il manifesto, poi si legge perché è così.
- * Il file è la composizione esecutiva corrente; quando cambia si sostituisce
- * l'immagine in `public/passaggi/` senza toccare il codice.
+ * L'immagine sta in `Manifesto`, che la prende da `src/data/locandina.ts`:
+ * qui dentro non c'è nessun percorso a nessun file.
  */
-export default function Locandina() {
+export default function Locandina({ azione }: { azione?: React.ReactNode }) {
   const { edizione } = useEdizione()
+  const { giorni } = useGiorni()
 
   return (
     <section id="locandina" className="scroll-mt-24">
@@ -19,10 +22,10 @@ export default function Locandina() {
           transition={{ duration: 0.7, ease: 'easeOut' }}
           className="order-2 lg:order-1"
         >
-          <img
-            src="/passaggi/06-locandina-esecutiva.jpg"
-            alt={`Manifesto della ${edizione.numero}ª ${edizione.nome}`}
-            className="w-full border border-antracite/12 shadow-[0_24px_60px_-30px_rgba(28,28,30,0.55)]"
+          <Manifesto
+            priorita
+            alt={`Manifesto della ${edizione.numero}ª ${edizione.nome} — ${edizione.luogo}, ${mostraGiorniEdizione(giorni)}`}
+            className="border border-antracite/12 shadow-[0_24px_60px_-30px_rgba(28,28,30,0.55)]"
           />
         </motion.figure>
 
@@ -44,16 +47,13 @@ export default function Locandina() {
             <p className="mt-5 font-display text-2xl text-magenta">{edizione.claim}</p>
           )}
 
-          <div className="mt-7 flex flex-wrap items-center gap-2">
-            <span className="rounded-full bg-cactus px-4 py-1.5 text-avorio">
-              {mostraGiorno(edizione.data_inizio)}
-            </span>
-            <span className="text-antracite-chiaro">→</span>
-            <span className="rounded-full bg-cactus-scuro px-4 py-1.5 text-avorio">
-              {mostraGiorno(edizione.data_fine)}
-            </span>
-            <span className="rounded-full bg-giallo px-4 py-1.5">{edizione.anno}</span>
-          </div>
+          {/* Due fine settimana, non dieci giorni di fila: la riga va letta
+              per intero, non compressa in un intervallo. */}
+          <p className="mt-7 font-display text-xl leading-snug">
+            {mostraGiorniEdizione(giorni)}
+          </p>
+
+          {azione}
 
           <p className="mt-7 max-w-md leading-relaxed text-antracite-chiaro">
             Manifesto ufficiale della {edizione.numero}ª edizione. Sotto, il progetto che lo

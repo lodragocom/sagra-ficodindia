@@ -7,6 +7,10 @@ export type Edizione = {
   claim: string | null
   data_inizio: string
   data_fine: string
+  // Giorni effettivi di apertura. Opzionale: la colonna `giorni date[]` su
+  // `sagra_edizioni` è proposta e non ancora applicata, e il campo deve restare
+  // opzionale perché il rollback della migrazione non rompa i tipi.
+  giorni?: string[] | null
   attiva: boolean
 }
 

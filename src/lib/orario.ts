@@ -59,3 +59,47 @@ export function mostraGiorno(giorno: string): string {
 export function mostraGiornoCorto(giorno: string): string {
   return giornoCorto.format(new Date(`${giorno}T12:00:00`))
 }
+
+const soloGiorno = new Intl.DateTimeFormat('it-IT', { day: 'numeric' })
+const soloMese = new Intl.DateTimeFormat('it-IT', { month: 'long' })
+
+/**
+ * La Sagra non dura dieci giorni di fila: sono due fine settimana.
+ * Scrivere "dal 9 al 18 ottobre" è falso, e la gente arriva il 13 e trova il
+ * paese chiuso. Questa funzione raggruppa i giorni consecutivi e li unisce:
+ * ["2026-10-09"…"2026-10-11","2026-10-16"…"2026-10-18"]
+ *   → "9, 10, 11 e 16, 17, 18 ottobre 2026"
+ */
+export function mostraGiorniEdizione(giorni: string[]): string {
+  if (giorni.length === 0) return ''
+  const ordinati = [...new Set(giorni)].sort()
+  const date = ordinati.map((g) => new Date(`${g}T12:00:00`))
+
+  const blocchi: Date[][] = []
+  for (const d of date) {
+    const corrente = blocchi[blocchi.length - 1]
+    const precedente = corrente?.[corrente.length - 1]
+    const consecutivo =
+      precedente && Math.round((d.getTime() - precedente.getTime()) / 86_400_000) === 1
+    if (consecutivo) corrente.push(d)
+    else blocchi.push([d])
+  }
+
+  const numeri = blocchi.map((b) => b.map((d) => soloGiorno.format(d)).join(', '))
+  const ultimo = date[date.length - 1]
+  const mese = soloMese.format(ultimo)
+  const anno = ultimo.getFullYear()
+
+  // Se i blocchi cadono in mesi diversi il mese va ripetuto: qui non succede,
+  // ma il caso esiste (edizioni a cavallo di fine ottobre) e va detto.
+  const mesiDistinti = new Set(blocchi.map((b) => soloMese.format(b[0])))
+  if (mesiDistinti.size > 1) {
+    return (
+      blocchi
+        .map((b, i) => `${numeri[i]} ${soloMese.format(b[0])}`)
+        .join(' e ') + ` ${anno}`
+    )
+  }
+
+  return `${numeri.join(' e ')} ${mese} ${anno}`
+}

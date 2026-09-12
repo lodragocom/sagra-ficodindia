@@ -1,0 +1,34 @@
+{
+  "permissions": {
+    "additionalDirectories": [
+      "/Users/salvatorelodrago/dev/lodrago/_ch",
+      "/Users/salvatorelodrago/dev/calatinolab25/sagra-ficodindia-dati"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "async": true,
+            "statusMessage": "Parnaso: allineo i cloni",
+            "command": "if [ -x /Users/salvatorelodrago/dev/lodrago/_ch/scripts/parnaso-sync.sh ]; then /Users/salvatorelodrago/dev/lodrago/_ch/scripts/parnaso-sync.sh deploy; fi"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "timeout": 120,
+            "statusMessage": "Parnaso: salvo il monte",
+            "command": "if [ -x /Users/salvatorelodrago/dev/lodrago/_ch/scripts/parnaso-sync.sh ]; then /Users/salvatorelodrago/dev/lodrago/_ch/scripts/parnaso-sync.sh push; fi"
+          }
+        ]
+      }
+    ]
+  }
+}

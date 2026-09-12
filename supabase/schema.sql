@@ -3,8 +3,14 @@
 -- Tutte le tabelle sono prefissate `sagra_` per non confondersi con quelle di Energia
 -- e degli altri rami.
 --
--- APPLICATO il 30/08/2026 come migrazione `sagra_ficodindia_schema`.
--- Questo file è la copia di riferimento: se si modifica, si riapplica come nuova migrazione.
+-- Stato al 2026-09-11 (verificato contro il database, non a memoria).
+-- Migrazioni applicate che questo file riflette:
+--   20260830210555  sagra_ficodindia_schema      (le cinque tabelle + RLS + realtime)
+--   20260831233121  sagra_passaggi_evoluzione    (sagra_passaggi + bucket `sagra`)
+-- Questo file è la copia di riferimento: se si modifica, si riapplica come nuova
+-- migrazione e si riporta qui il nome. Chi aggiunge una tabella sul database e non
+-- la scrive qui rompe il file per chi arriva dopo: è successo con sagra_passaggi,
+-- rimasta fuori da questo schema per undici giorni.
 
 create table if not exists sagra_edizioni (
   id          uuid primary key default gen_random_uuid(),
@@ -54,6 +60,7 @@ create table if not exists sagra_aggiornamenti (
   in_evidenza  boolean not null default false,
   pubblicato   boolean not null default false
 );
+create index if not exists sagra_aggiornamenti_data_idx on sagra_aggiornamenti (pubblicato_il desc);
 
 create table if not exists sagra_info (
   id           uuid primary key default gen_random_uuid(),
@@ -64,18 +71,36 @@ create table if not exists sagra_info (
   pubblicato   boolean not null default false
 );
 
+-- I passaggi dell'evoluzione della locandina: quello che il sito mostra in /progetto.
+-- Ogni riga è uno stadio del lavoro, fatto o ancora da fare.
+create table if not exists sagra_passaggi (
+  id           uuid primary key default gen_random_uuid(),
+  edizione_id  uuid references sagra_edizioni(id) on delete cascade,
+  ordine       int  not null default 0,
+  titolo       text not null,
+  testo        text,
+  immagine_url text,           -- URL assoluto (storage) oppure percorso interno (/passaggi/...)
+  didascalia   text,
+  stato        text not null default 'da fare' check (stato in ('fatto','in corso','da fare')),
+  data         date,
+  pubblicato   boolean not null default false
+);
+create index if not exists sagra_passaggi_ordine_idx on sagra_passaggi (ordine);
+
 -- RLS: il pubblico legge solo ciò che è pubblicato, scrive solo chi è autenticato.
 alter table sagra_edizioni      enable row level security;
 alter table sagra_eventi        enable row level security;
 alter table sagra_sponsor       enable row level security;
 alter table sagra_aggiornamenti enable row level security;
 alter table sagra_info          enable row level security;
+alter table sagra_passaggi      enable row level security;
 
 create policy "sagra_edizioni lettura pubblica"   on sagra_edizioni      for select using (attiva);
 create policy "sagra_eventi lettura pubblica"     on sagra_eventi        for select using (pubblicato);
 create policy "sagra_sponsor lettura pubblica"    on sagra_sponsor       for select using (pubblicato);
 create policy "sagra_aggiornamenti lettura pubblica" on sagra_aggiornamenti for select using (pubblicato);
 create policy "sagra_info lettura pubblica"       on sagra_info          for select using (pubblicato);
+create policy "sagra_passaggi lettura pubblica"   on sagra_passaggi      for select using (pubblicato);
 
 -- Scrittura: SOLO admin e moderator, tramite la funzione has_role() che esiste già sul
 -- progetto. Non "authenticated": su questo Supabase si registrano anche i lead dell'energia,
@@ -102,9 +127,26 @@ create policy "sagra_info gestione" on sagra_info for all to authenticated
   using (public.has_role(auth.uid(), 'admin') or public.has_role(auth.uid(), 'moderator'))
   with check (public.has_role(auth.uid(), 'admin') or public.has_role(auth.uid(), 'moderator'));
 
+create policy "sagra_passaggi gestione" on sagra_passaggi for all to authenticated
+  using (public.has_role(auth.uid(), 'admin') or public.has_role(auth.uid(), 'moderator'))
+  with check (public.has_role(auth.uid(), 'admin') or public.has_role(auth.uid(), 'moderator'));
+
+-- Spazio immagini pubblico dei passaggi. Lettura aperta, scrittura ad admin e moderator.
+insert into storage.buckets (id, name, public)
+values ('sagra', 'sagra', true)
+on conflict (id) do nothing;
+
+create policy "sagra storage lettura pubblica" on storage.objects
+  for select using (bucket_id = 'sagra');
+
+create policy "sagra storage scrittura" on storage.objects for all to authenticated
+  using (bucket_id = 'sagra' and (public.has_role(auth.uid(), 'admin') or public.has_role(auth.uid(), 'moderator')))
+  with check (bucket_id = 'sagra' and (public.has_role(auth.uid(), 'admin') or public.has_role(auth.uid(), 'moderator')));
+
 -- Realtime: senza questo il sito non riceve i cambi mentre la pagina è aperta.
 alter publication supabase_realtime add table sagra_eventi;
 alter publication supabase_realtime add table sagra_aggiornamenti;
 alter publication supabase_realtime add table sagra_sponsor;
 alter publication supabase_realtime add table sagra_info;
 alter publication supabase_realtime add table sagra_edizioni;
+alter publication supabase_realtime add table sagra_passaggi;
