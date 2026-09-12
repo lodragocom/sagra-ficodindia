@@ -56,17 +56,25 @@ export default function Locandina({ azione }: { azione?: React.ReactNode }) {
           {azione}
 
           <p className="mt-7 max-w-md leading-relaxed text-antracite-chiaro">
-            Manifesto ufficiale della {edizione.numero}ª edizione. Sotto, il progetto che lo
-            regge: il briefing, l'identità della Sagra e il sistema visivo con cui viene
-            declinata quest'anno.
+            Manifesto della {edizione.numero}ª edizione, nello stato in cui è oggi: la
+            lavorazione è ancora aperta. Sotto restano tutte le versioni, e il progetto che
+            le regge — il briefing, l'identità della Sagra e il sistema visivo di quest'anno.
           </p>
 
-          <a
-            href="#progetto"
-            className="mt-6 inline-block border-b border-cactus pb-0.5 text-cactus-scuro transition-colors hover:text-antracite"
-          >
-            Il progetto ↓
-          </a>
+          <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2">
+            <a
+              href="#versioni"
+              className="inline-block border-b border-cactus pb-0.5 text-cactus-scuro transition-colors hover:text-antracite"
+            >
+              Le versioni ↓
+            </a>
+            <a
+              href="#progetto"
+              className="inline-block border-b border-cactus pb-0.5 text-cactus-scuro transition-colors hover:text-antracite"
+            >
+              Il progetto ↓
+            </a>
+          </div>
         </motion.div>
       </div>
     </section>

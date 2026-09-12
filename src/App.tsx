@@ -38,6 +38,14 @@ export default function App() {
             >
               La locandina
             </a>
+            {/* Le versioni stanno nel menù perché sono il motivo per cui questo
+                sito esiste: mostrare la lavorazione, non solo l'esito. */}
+            <a
+              href="#versioni"
+              className="text-antracite-chiaro transition-colors hover:text-antracite"
+            >
+              Le versioni
+            </a>
             <a
               href="#progetto"
               className="text-antracite-chiaro transition-colors hover:text-antracite"

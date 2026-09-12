@@ -3,6 +3,7 @@ import Locandina from '../components/Locandina'
 import Progetto from '../components/Progetto'
 import CartaEvento from '../components/CartaEvento'
 import ProgrammaCompleto from '../components/ProgrammaCompleto'
+import VersioniLocandina from '../components/VersioniLocandina'
 import { SpiaLive } from '../components/Stato'
 import { useTabella } from '../hooks/useTabella'
 import { useAdesso } from '../hooks/useAdesso'
@@ -102,6 +103,8 @@ export default function Home() {
           </Link>
         </section>
       )}
+
+      <VersioniLocandina />
 
       <Progetto />
     </div>
